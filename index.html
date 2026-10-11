@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIOptim – Google-Bewertungen automatisch beantworten</title>
+  <meta name="description" content="AIOptim überwacht Ihre Google-Bewertungen, schreibt passende Antworten per KI und steigert Ihre lokale Sichtbarkeit – ohne Zeitaufwand. 14 Tage kostenlos testen." />
+  <meta name="theme-color" content="#1d4ed8" />
+  <meta property="og:title" content="AIOptim – Mehr Sterne. Mehr Kunden. Null Aufwand." />
+  <meta property="og:description" content="Google-Bewertungen automatisch überwachen und per KI beantworten. Für Handwerker, Friseure, Fahrschulen & Restaurants." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Cpath d='M16 6l2.9 6.2 6.8.8-5 4.6 1.3 6.7L16 21l-6 3.3 1.3-6.7-5-4.6 6.8-.8z' fill='%23fbbf24'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+          },
+          boxShadow: { soft: '0 10px 40px -12px rgba(15, 23, 42, 0.18)' },
+        },
+      },
+    };
+  </script>
+  <style>
+    [x-cloak] { display: none !important; }
+    .typing-caret::after { content: '▍'; margin-left: 1px; color: #2563eb; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .faq-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+    .faq-panel > div { overflow: hidden; }
+    .faq-item[data-open="true"] .faq-panel { grid-template-rows: 1fr; }
+    .faq-item[data-open="true"] .faq-icon { transform: rotate(45deg); }
+    .bg-grid { background-image: radial-gradient(circle at 1px 1px, rgba(37, 99, 235, .10) 1px, transparent 0); background-size: 22px 22px; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body class="bg-white font-sans text-slate-700 antialiased">
+
+  <!-- ============ 1. HEADER / NAVIGATION ============ -->
+  <header id="top" class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur">
+    <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="Hauptnavigation">
+      <a href="#top" class="flex items-center gap-2" aria-label="AIOptim Startseite">
+        <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-700 text-amber-400 shadow-sm">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>
+        </span>
+        <span class="text-lg font-extrabold tracking-tight text-slate-900">AI<span class="text-brand-700">Optim</span></span>
+      </a>
+
+      <ul class="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex">
+        <li><a href="#problem" class="hover:text-brand-700">Warum</a></li>
+        <li><a href="#funktionen" class="hover:text-brand-700">Funktionen</a></li>
+        <li><a href="#stimmen" class="hover:text-brand-700">Kundenstimmen</a></li>
+        <li><a href="#preise" class="hover:text-brand-700">Preise</a></li>
+        <li><a href="#faq" class="hover:text-brand-700">FAQ</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <a href="#login" data-open-signup data-mode="login" class="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 sm:inline-block">Anmelden</a>
+        <button type="button" data-open-signup class="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">Kostenlos testen</button>
+        <button type="button" id="menuToggle" class="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden" aria-controls="mobileMenu" aria-expanded="false" aria-label="Menü öffnen">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </nav>
+    <div id="mobileMenu" class="hidden border-t border-slate-200 bg-white lg:hidden">
+      <ul class="space-y-1 px-4 py-3 text-base font-medium text-slate-700">
+        <li><a href="#problem" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Warum AIOptim</a></li>
+        <li><a href="#funktionen" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Funktionen</a></li>
+        <li><a href="#stimmen" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Kundenstimmen</a></li>
+        <li><a href="#preise" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Preise</a></li>
+        <li><a href="#faq" class="block rounded-lg px-3 py-2 hover:bg-slate-50">FAQ</a></li>
+        <li><a href="#login" data-open-signup data-mode="login" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Anmelden</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ 2. HERO ============ -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white">
+      <div class="bg-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]" aria-hidden="true"></div>
+      <div class="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-2 lg:gap-10 lg:px-8 lg:pb-24 lg:pt-20">
+
+        <!-- Copy + Onboarding -->
+        <div class="flex min-w-0 flex-col justify-center">
+          <p class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm">
+            <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span></span>
+            Für Handwerk, Friseure, Fahrschulen &amp; Gastronomie
+          </p>
+
+          <h1 class="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl lg:text-[3.4rem]">
+            Mehr Sterne. Mehr Kunden.<br class="hidden sm:block" />
+            <span class="bg-gradient-to-r from-brand-700 to-sky-500 bg-clip-text text-transparent">Null Aufwand.</span>
+          </h1>
+
+          <p class="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
+            AIOptim überwacht Ihre Google-Bewertungen rund um die Uhr, schreibt per KI die perfekte Antwort im Ton Ihres Betriebs – und Sie geben sie mit <strong class="font-semibold text-slate-900">einem Klick</strong> frei. So steigen Sie bei Google Maps nach oben, während Sie sich um Ihre Kunden kümmern.
+          </p>
+
+          <!-- Gratis-Analyse -->
+          <form id="analysisForm" class="mt-8 max-w-xl" novalidate>
+            <label for="analysisInput" class="mb-2 block text-sm font-semibold text-slate-900">Kostenlose Profil-Analyse in 30 Sekunden</label>
+            <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-soft sm:flex-row">
+              <div class="relative flex-1">
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-6.2-7-11.5A7 7 0 0112 2.5a7 7 0 017 7C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                <input id="analysisInput" name="business" type="text" autocomplete="organization" required minlength="3"
+                  class="h-12 w-full rounded-xl border-0 bg-transparent pl-10 pr-3 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  placeholder="Firmenname, Ort – oder Google-Maps-Link" aria-describedby="analysisHint analysisError" />
+              </div>
+              <button type="submit" class="h-12 shrink-0 rounded-xl bg-brand-700 px-6 text-base font-semibold text-white shadow-sm transition hover:bg-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
+                Gratis-Analyse starten
+              </button>
+            </div>
+            <p id="analysisError" class="mt-2 hidden text-sm font-medium text-rose-600" role="alert"></p>
+            <p id="analysisHint" class="mt-2 text-xs text-slate-500">z. B. „Friseur Haarmonie Köln“ oder „https://maps.app.goo.gl/…“</p>
+          </form>
+
+          <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-slate-600">
+            <li class="flex items-center gap-2"><svg class="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Keine Kreditkarte erforderlich</li>
+            <li class="flex items-center gap-2"><svg class="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>In 2 Minuten einsatzbereit</li>
+            <li class="flex items-center gap-2"><svg class="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>DSGVO-konform · Server in der EU</li>
+          </ul>
+        </div>
+
+        <!-- Interaktive Produkt-Demo -->
+        <div class="relative min-w-0">
+          <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-tr from-brand-200/60 via-sky-100 to-amber-100/60 blur-2xl" aria-hidden="true"></div>
+          <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft" id="demo" aria-label="Interaktive Produkt-Demo">
+            <!-- App-Bar -->
+            <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-3">
+              <div class="flex items-center gap-1.5" aria-hidden="true">
+                <span class="h-3 w-3 rounded-full bg-rose-400"></span><span class="h-3 w-3 rounded-full bg-amber-400"></span><span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+              </div>
+              <p class="text-xs font-semibold text-slate-500">app.aioptim.de · Posteingang</p>
+              <span id="demoBadge" class="rounded-full bg-brand-700 px-2 py-0.5 text-[11px] font-bold text-white">3 neu</span>
+            </div>
+
+            <!-- Review-Tabs -->
+            <div class="flex gap-2 overflow-x-auto border-b border-slate-100 px-4 pt-3" role="tablist" aria-label="Beispiel-Bewertungen">
+              <button type="button" role="tab" data-review="0" class="demo-tab whitespace-nowrap border-b-2 px-2 pb-2 text-sm font-semibold">★★★★★ Lob</button>
+              <button type="button" role="tab" data-review="1" class="demo-tab whitespace-nowrap border-b-2 px-2 pb-2 text-sm font-semibold">★★★☆☆ Gemischt</button>
+              <button type="button" role="tab" data-review="2" class="demo-tab whitespace-nowrap border-b-2 px-2 pb-2 text-sm font-semibold">★☆☆☆☆ Kritik</button>
+            </div>
+
+            <div class="space-y-4 p-4 sm:p-5">
+              <!-- Eingehende Bewertung -->
+              <article class="rounded-xl border border-slate-200 p-4">
+                <div class="flex items-start gap-3">
+                  <div id="reviewAvatar" class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-100 font-bold text-amber-700">S</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-x-2">
+                      <p id="reviewAuthor" class="font-semibold text-slate-900">Sandra K.</p>
+                      <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 01-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0012 22z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 000 9.2L6.4 14z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 003.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z"/></svg>
+                        Google · <span id="reviewTime">vor 12 Min.</span>
+                      </span>
+                    </div>
+                    <p id="reviewStars" class="mt-0.5 text-amber-400" aria-label="5 von 5 Sternen">★★★★★</p>
+                    <p id="reviewText" class="mt-2 text-sm leading-relaxed text-slate-700"></p>
+                  </div>
+                </div>
+              </article>
+
+              <!-- KI-Antwort -->
+              <div class="rounded-xl border border-brand-200 bg-brand-50/60 p-4">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p class="flex items-center gap-2 text-sm font-semibold text-brand-800">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></svg>
+                    KI-Antwortvorschlag
+                  </p>
+                  <label class="flex items-center gap-2 text-xs font-medium text-slate-600">
+                    Tonfall
+                    <select id="toneSelect" class="rounded-lg border border-slate-200 bg-white py-1 pl-2 pr-7 text-xs font-semibold text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                      <option value="herzlich">Herzlich</option>
+                      <option value="professionell">Professionell</option>
+                      <option value="locker">Locker (Du)</option>
+                    </select>
+                  </label>
+                </div>
+                <p id="replyText" class="min-h-[7.5rem] whitespace-pre-line text-sm leading-relaxed text-slate-800" aria-live="polite"></p>
+                <textarea id="replyEditor" rows="6" class="hidden w-full rounded-lg border border-brand-300 bg-white p-3 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Antwort bearbeiten"></textarea>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <button type="button" id="publishBtn" class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:flex-none">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    1-Klick-Antworten
+                  </button>
+                  <button type="button" id="editBtn" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.2 5.2l3.6 3.6M4 20l4.2-.9L19.4 7.9a2.5 2.5 0 00-3.6-3.6L4.9 15.8z"/></svg>
+                    <span>Anpassen</span>
+                  </button>
+                  <button type="button" id="regenBtn" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5.5 15a7 7 0 0012 2.5L20 14M4 10l2.5-3.5A7 7 0 0118.5 9"/></svg>
+                    Neu
+                  </button>
+                </div>
+                <p id="publishStatus" class="mt-3 hidden items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700" role="status"></p>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-lg bg-slate-50 p-2"><p class="text-lg font-bold text-slate-900">4,8 ★</p><p class="text-[11px] text-slate-500">Ø Bewertung</p></div>
+                <div class="rounded-lg bg-slate-50 p-2"><p id="statRate" class="text-lg font-bold text-slate-900">97 %</p><p class="text-[11px] text-slate-500">Antwortquote</p></div>
+                <div class="rounded-lg bg-slate-50 p-2"><p class="text-lg font-bold text-emerald-600">▲ 3</p><p class="text-[11px] text-slate-500">Maps-Ranking</p></div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-3 text-center text-xs text-slate-500">Probieren Sie es aus: Bewertung wählen, Tonfall ändern, Antwort freigeben.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Branchen-Leiste -->
+    <section class="border-y border-slate-100 bg-slate-50/60" aria-label="Branchen">
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 py-6 text-sm font-semibold text-slate-500 sm:px-6 lg:px-8">
+        <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Gemacht für</span>
+        <span>🔧 Handwerksbetriebe</span><span>✂️ Friseursalons</span><span>🚗 Fahrschulen</span><span>🍽️ Restaurants &amp; Cafés</span><span>🛠️ KFZ-Werkstätten</span><span>💆 Kosmetik &amp; Physio</span>
+      </div>
+    </section>
+
+    <!-- ============ 3. PROBLEM ============ -->
+    <section id="problem" class="scroll-mt-20 py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-sm font-bold uppercase tracking-wider text-rose-600">Das kostet Sie gerade Kunden</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Ihr Google-Profil ist Ihr neues Schaufenster – und es steht oft unbeachtet da.</h2>
+          <p class="mt-4 text-lg text-slate-600">Bevor ein Neukunde anruft, liest er Ihre Bewertungen. Was er dort sieht, entscheidet in Sekunden.</p>
+        </div>
+
+        <div class="mt-14 grid gap-6 md:grid-cols-3">
+          <article class="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-rose-50 text-rose-600">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5M21 12a9 9 0 01-13.4 7.8L3 21l1.2-4.6A9 9 0 1121 12z"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-slate-900">Unbeantwortete Bewertungen schrecken Neukunden ab</h3>
+            <p class="mt-3 leading-relaxed text-slate-600">Eine Kritik ohne Antwort wirkt wie ein Eingeständnis. Ein Lob ohne Dank wirkt desinteressiert. Interessenten wählen dann einfach den Betrieb, der sich sichtbar kümmert – und Sie erfahren nie davon.</p>
+            <p class="mt-5 rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">Jede offene Bewertung ist eine verpasste Chance.</p>
+          </article>
+
+          <article class="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-amber-50 text-amber-600">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 7v5l3 2"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-slate-900">Texte nach Feierabend? Dafür fehlt die Kraft.</h3>
+            <p class="mt-3 leading-relaxed text-slate-600">Nach zehn Stunden auf der Baustelle, im Salon oder in der Küche will niemand noch am Handy formulieren. Besonders nicht bei unfairer Kritik, die man erst einmal sacken lassen muss.</p>
+            <p class="mt-5 rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700">Ihre Zeit gehört Ihren Kunden – und Ihrer Familie.</p>
+          </article>
+
+          <article class="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-slate-100 text-slate-700">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7l6 6 4-4 8 8M21 11v6h-6"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-slate-900">Wenig Aktivität = schlechteres Ranking bei Google Maps</h3>
+            <p class="mt-3 leading-relaxed text-slate-600">Google bevorzugt Profile, die aktiv gepflegt werden. Wer nicht reagiert, rutscht in der Kartenansicht nach unten – und die Konkurrenz zwei Straßen weiter bekommt den Anruf.</p>
+            <p class="mt-5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">Wer unten steht, wird nicht gefunden.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. LÖSUNG / FEATURES ============ -->
+    <section id="funktionen" class="scroll-mt-20 bg-slate-900 py-20 text-slate-300 sm:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-sm font-bold uppercase tracking-wider text-sky-400">Die Lösung</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Drei Funktionen. Ein Ergebnis: Sie werden gefunden.</h2>
+          <p class="mt-4 text-lg text-slate-400">Einmal verbinden, danach läuft AIOptim im Hintergrund. Sie entscheiden nur noch: freigeben oder anpassen.</p>
+        </div>
+
+        <ol class="mt-14 grid gap-6 lg:grid-cols-3">
+          <li class="relative rounded-2xl border border-white/10 bg-white/5 p-7">
+            <span class="absolute right-6 top-6 text-5xl font-extrabold text-white/10" aria-hidden="true">01</span>
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 text-sky-300">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3A6 6 0 006 11v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-white">Automated Monitoring</h3>
+            <p class="mt-1 text-sm font-semibold text-sky-300">Keine Bewertung geht mehr unter</p>
+            <p class="mt-3 leading-relaxed">AIOptim ruft neue Google-Bewertungen automatisch ab – mehrmals täglich. Bei Kritik erhalten Sie sofort eine Benachrichtigung, damit Sie reagieren, bevor sie Schaden anrichtet.</p>
+            <ul class="mt-5 space-y-2 text-sm">
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Direkte Anbindung an Ihr Google-Unternehmensprofil</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Sofort-Alarm bei 1–3 Sternen</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Alle Standorte in einem Posteingang</li>
+            </ul>
+          </li>
+
+          <li class="relative rounded-2xl border border-brand-500/40 bg-gradient-to-b from-brand-600/20 to-white/5 p-7 ring-1 ring-brand-500/30">
+            <span class="absolute right-6 top-6 text-5xl font-extrabold text-white/10" aria-hidden="true">02</span>
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-brand-500/20 text-brand-200">
+              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-white">Smart AI-Response</h3>
+            <p class="mt-1 text-sm font-semibold text-brand-200">Die passende Antwort in Sekunden</p>
+            <p class="mt-3 leading-relaxed">Die KI liest jede Bewertung, erkennt Lob, Kritik und Details – und formuliert eine individuelle, freundliche Antwort in Ihrem Tonfall. Sie geben mit einem Klick frei oder passen kurz an.</p>
+            <ul class="mt-5 space-y-2 text-sm">
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Kein Copy-&amp;-Paste: jede Antwort ist einzigartig</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Deeskalierend bei Kritik, herzlich bei Lob</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Nichts geht ohne Ihre Freigabe online</li>
+            </ul>
+          </li>
+
+          <li class="relative rounded-2xl border border-white/10 bg-white/5 p-7">
+            <span class="absolute right-6 top-6 text-5xl font-extrabold text-white/10" aria-hidden="true">03</span>
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-emerald-500/15 text-emerald-300">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-bold text-white">Local Ranking-Tracker</h3>
+            <p class="mt-1 text-sm font-semibold text-emerald-300">Ihre Sichtbarkeit, jeden Montag im Postfach</p>
+            <p class="mt-3 leading-relaxed">Ein kompakter Wochenbericht per E-Mail zeigt, wo Sie bei Google Maps für Ihre wichtigsten Suchbegriffe in der Region stehen – und was sich gegenüber der Vorwoche verändert hat.</p>
+            <ul class="mt-5 space-y-2 text-sm">
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Platzierung für z. B. „Friseur in der Nähe“</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>Vergleich mit Mitbewerbern im Umkreis</li>
+              <li class="flex gap-2"><span class="text-emerald-400">✓</span>In 60 Sekunden gelesen – ohne Fachchinesisch</li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <button type="button" data-open-signup class="w-full rounded-xl bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100 sm:w-auto">14 Tage kostenlos testen</button>
+          <span class="text-sm text-slate-400">Einrichtung in 2 Minuten · jederzeit kündbar</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. SOCIAL PROOF ============ -->
+    <!-- Hinweis: Beispiel-Testimonials. Vor dem Livegang durch echte, freigegebene Kundenstimmen ersetzen (UWG). -->
+    <section id="stimmen" class="scroll-mt-20 py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-sm font-bold uppercase tracking-wider text-brand-700">Aus der Praxis</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Weniger Schreibarbeit. Mehr Anrufe.</h2>
+          <p class="mt-4 text-lg text-slate-600">Inhaber, die keine Zeit für Marketing haben – und es jetzt trotzdem machen.</p>
+        </div>
+
+        <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <figure class="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <p class="text-amber-400" aria-label="5 von 5 Sternen">★★★★★</p>
+            <blockquote class="mt-4 flex-1 leading-relaxed text-slate-700">„Früher habe ich sonntags eine Stunde lang Bewertungen beantwortet – oder es gelassen. Jetzt tippe ich morgens beim Kaffee zweimal aufs Handy und fertig. Seit drei Monaten kommen spürbar mehr Anfragen über Google rein, vor allem für Inspektionen.“</blockquote>
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+              <span class="grid h-11 w-11 place-items-center rounded-full bg-brand-100 font-bold text-brand-800">MB</span>
+              <span><span class="block font-semibold text-slate-900">Markus B.</span><span class="block text-sm text-slate-500">Inhaber, KFZ-Werkstatt · Bielefeld</span></span>
+            </figcaption>
+            <p class="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">≈ 4 Std. pro Monat gespart</p>
+          </figure>
+
+          <figure class="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <p class="text-amber-400" aria-label="5 von 5 Sternen">★★★★★</p>
+            <blockquote class="mt-4 flex-1 leading-relaxed text-slate-700">„Bei einer unfairen 1-Stern-Bewertung war ich richtig sauer. Die KI hat eine ruhige, souveräne Antwort vorgeschlagen, die ich selbst nie so hinbekommen hätte. Neue Kundinnen sprechen mich sogar darauf an, wie nett wir antworten.“</blockquote>
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+              <span class="grid h-11 w-11 place-items-center rounded-full bg-rose-100 font-bold text-rose-700">JT</span>
+              <span><span class="block font-semibold text-slate-900">Jasmin T.</span><span class="block text-sm text-slate-500">Inhaberin, Friseursalon · Leipzig</span></span>
+            </figcaption>
+            <p class="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">Antwortquote von 20 % auf 100 %</p>
+          </figure>
+
+          <figure class="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm md:col-span-2 lg:col-span-1">
+            <p class="text-amber-400" aria-label="5 von 5 Sternen">★★★★★</p>
+            <blockquote class="mt-4 flex-1 leading-relaxed text-slate-700">„Der Montagsbericht ist Gold wert. Ich sehe endlich schwarz auf weiß, dass wir bei ‚Fahrschule in der Nähe‘ von Platz 7 auf Platz 2 geklettert sind. Und die Anmeldungen über Google haben sich deutlich erhöht.“</blockquote>
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+              <span class="grid h-11 w-11 place-items-center rounded-full bg-amber-100 font-bold text-amber-800">SK</span>
+              <span><span class="block font-semibold text-slate-900">Stefan K.</span><span class="block text-sm text-slate-500">Inhaber, Fahrschule · Augsburg</span></span>
+            </figcaption>
+            <p class="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">Maps-Ranking: Platz 7 → Platz 2</p>
+          </figure>
+        </div>
+
+        <dl class="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-6 rounded-2xl bg-brand-50 p-6 text-center sm:grid-cols-4 sm:p-8">
+          <div><dt class="text-xs font-medium text-slate-600">Zeit pro Antwort</dt><dd class="mt-1 text-2xl font-extrabold text-brand-800">&lt; 10 Sek.</dd></div>
+          <div><dt class="text-xs font-medium text-slate-600">Einrichtung</dt><dd class="mt-1 text-2xl font-extrabold text-brand-800">2 Min.</dd></div>
+          <div><dt class="text-xs font-medium text-slate-600">Überwachung</dt><dd class="mt-1 text-2xl font-extrabold text-brand-800">24/7</dd></div>
+          <div><dt class="text-xs font-medium text-slate-600">Vertragsbindung</dt><dd class="mt-1 text-2xl font-extrabold text-brand-800">Keine</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ============ 6. PREISE ============ -->
+    <section id="preise" class="scroll-mt-20 bg-slate-50 py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-sm font-bold uppercase tracking-wider text-brand-700">Preise</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Weniger als ein Haarschnitt im Monat.</h2>
+          <p class="mt-4 text-lg text-slate-600">Beide Tarife 14 Tage kostenlos. Keine Kreditkarte, keine Mindestlaufzeit, kein Risiko.</p>
+        </div>
+
+        <!-- Abrechnungs-Toggle -->
+        <div class="mt-8 flex items-center justify-center gap-3 text-sm font-semibold">
+          <span id="billMonthlyLabel" class="text-slate-900">Monatlich</span>
+          <button type="button" id="billingToggle" role="switch" aria-checked="false" aria-label="Jährliche Abrechnung" class="relative h-7 w-12 rounded-full bg-slate-300 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
+            <span class="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition-transform"></span>
+          </button>
+          <span id="billYearlyLabel" class="text-slate-500">Jährlich <span class="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">2 Monate gratis</span></span>
+        </div>
+
+        <div class="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
+          <!-- Basis -->
+          <div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-900">Basis</h3>
+            <p class="mt-1 text-sm text-slate-500">Für Betriebe, die den Überblick behalten wollen.</p>
+            <p class="mt-6 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-slate-900" data-price-monthly="19" data-price-yearly="15,83">19 €</span>
+              <span class="text-sm font-medium text-slate-500">/ Monat</span>
+            </p>
+            <p class="mt-1 h-5 text-xs text-slate-500" data-billing-note data-yearly-total="190">zzgl. MwSt. · monatlich kündbar</p>
+            <button type="button" data-open-signup data-plan="basis" class="mt-6 rounded-xl border-2 border-brand-700 px-5 py-3 text-center font-semibold text-brand-700 transition hover:bg-brand-50">14 Tage gratis testen</button>
+            <ul class="mt-8 space-y-3 text-sm">
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Automatische Überwachung neuer Bewertungen</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span><strong class="font-semibold text-slate-900">20 KI-Antworten</strong> pro Monat</span></li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>1-Klick-Freigabe &amp; Bearbeitung</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>1 Standort</li>
+              <li class="flex gap-3 text-slate-400"><svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M6 12h12"/></svg>Wöchentlicher Ranking-Report</li>
+              <li class="flex gap-3 text-slate-400"><svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M6 12h12"/></svg>Sofort-Alarm per E-Mail &amp; SMS</li>
+            </ul>
+          </div>
+
+          <!-- Pro / Booster -->
+          <div class="relative flex flex-col rounded-2xl border-2 border-brand-700 bg-white p-8 shadow-soft">
+            <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-700 px-4 py-1 text-xs font-bold uppercase tracking-wide text-white">Am beliebtesten</span>
+            <h3 class="flex items-center gap-2 text-lg font-bold text-slate-900">Pro <span class="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">Booster</span></h3>
+            <p class="mt-1 text-sm text-slate-500">Für Betriebe, die bei Google ganz nach oben wollen.</p>
+            <p class="mt-6 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-slate-900" data-price-monthly="39" data-price-yearly="32,50">39 €</span>
+              <span class="text-sm font-medium text-slate-500">/ Monat</span>
+            </p>
+            <p class="mt-1 h-5 text-xs text-slate-500" data-billing-note data-yearly-total="390">zzgl. MwSt. · monatlich kündbar</p>
+            <button type="button" data-open-signup data-plan="pro" class="mt-6 rounded-xl bg-brand-700 px-5 py-3 text-center font-semibold text-white shadow-sm transition hover:bg-brand-800">14 Tage gratis testen</button>
+            <ul class="mt-8 space-y-3 text-sm">
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Alles aus Basis, plus:</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span><strong class="font-semibold text-slate-900">Unbegrenzte</strong> KI-Antworten</span></li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Wöchentlicher Local-Ranking-Report</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Sofort-Alarm bei Kritik per E-Mail &amp; SMS</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Mitbewerber-Vergleich im Umkreis</li>
+              <li class="flex gap-3"><svg class="h-5 w-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Bis zu 3 Standorte · Priorisierter Support</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mx-auto mt-10 flex max-w-3xl flex-col items-center gap-4 rounded-2xl border border-emerald-200 bg-white p-6 text-center sm:flex-row sm:text-left">
+          <div class="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <p class="text-sm leading-relaxed text-slate-600"><strong class="font-semibold text-slate-900">Ihr Risiko: null.</strong> Testen Sie 14 Tage alle Funktionen kostenlos. Gefällt es Ihnen nicht, tun Sie einfach nichts – der Test endet automatisch, ohne Kosten und ohne Kündigung.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 7. FAQ ============ -->
+    <section id="faq" class="scroll-mt-20 py-20 sm:py-24">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <p class="text-sm font-bold uppercase tracking-wider text-brand-700">Häufige Fragen</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Alles, was Sie wissen müssen</h2>
+        </div>
+
+        <div id="faqList" class="mt-12 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+          <!-- per JS gefüllt (siehe app.js -> FAQ_ITEMS) -->
+        </div>
+
+        <p class="mt-8 text-center text-sm text-slate-600">Noch eine Frage? Schreiben Sie uns: <a href="mailto:hallo@aioptim.de" class="font-semibold text-brand-700 hover:underline">hallo@aioptim.de</a> – wir antworten werktags innerhalb von 24 Stunden.</p>
+      </div>
+    </section>
+
+    <!-- ============ 8. FINAL CTA / LEAD-CATCHER ============ -->
+    <section id="start" class="scroll-mt-20 px-4 pb-20 sm:px-6 lg:px-8">
+      <div class="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-800 to-slate-900 px-6 py-14 text-center shadow-soft sm:px-12 sm:py-16">
+        <div class="bg-grid pointer-events-none absolute inset-0 opacity-30" aria-hidden="true"></div>
+        <div class="relative">
+          <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Ihre nächste Bewertung kommt bestimmt.<br class="hidden sm:block" /> Seien Sie vorbereitet.</h2>
+          <p class="mx-auto mt-4 max-w-2xl text-lg text-brand-100">Starten Sie jetzt Ihren 14-tägigen Gratis-Test. Wir schicken Ihnen den Zugang sofort per E-Mail.</p>
+
+          <form id="leadForm" class="mx-auto mt-8 max-w-xl" novalidate>
+            <div class="flex flex-col gap-2 rounded-2xl bg-white/10 p-2 ring-1 ring-white/20 backdrop-blur sm:flex-row">
+              <label for="leadEmail" class="sr-only">Geschäftliche E-Mail-Adresse</label>
+              <input id="leadEmail" name="email" type="email" autocomplete="email" required inputmode="email"
+                class="h-12 flex-1 rounded-xl border-0 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                placeholder="ihre@email.de" aria-describedby="leadError" />
+              <button type="submit" class="h-12 shrink-0 rounded-xl bg-amber-400 px-6 text-base font-bold text-slate-900 shadow-sm transition hover:bg-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">Test jetzt starten</button>
+            </div>
+            <label class="mt-3 flex items-start justify-center gap-2 text-left text-xs text-brand-100">
+              <input type="checkbox" name="consent" required class="mt-0.5 h-4 w-4 rounded border-white/40 text-amber-400 focus:ring-amber-400" />
+              <span>Ich stimme der Verarbeitung meiner Daten gemäß <a href="#datenschutz" class="underline hover:text-white">Datenschutzerklärung</a> zu. Abmeldung jederzeit möglich.</span>
+            </label>
+            <p id="leadError" class="mt-2 hidden text-sm font-semibold text-amber-300" role="alert"></p>
+          </form>
+          <div id="leadSuccess" class="mx-auto mt-8 hidden max-w-xl rounded-2xl bg-white p-6 text-left" role="status"></div>
+
+          <ul class="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-brand-100">
+            <li>✓ Keine Kreditkarte</li><li>✓ Endet automatisch</li><li>✓ Persönlicher Support auf Deutsch</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-4 lg:px-8">
+      <div class="md:col-span-2">
+        <a href="#top" class="flex items-center gap-2">
+          <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-700 text-amber-400"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg></span>
+          <span class="font-extrabold text-slate-900">AI<span class="text-brand-700">Optim</span></span>
+        </a>
+        <p class="mt-4 max-w-sm text-sm leading-relaxed text-slate-500">Bewertungsmanagement mit KI für lokale Betriebe. Mehr Sterne, mehr Sichtbarkeit, mehr Kunden – ohne Zeitaufwand.</p>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-slate-900">Produkt</p>
+        <ul class="mt-3 space-y-2 text-sm text-slate-500">
+          <li><a href="#funktionen" class="hover:text-brand-700">Funktionen</a></li>
+          <li><a href="#preise" class="hover:text-brand-700">Preise</a></li>
+          <li><a href="#faq" class="hover:text-brand-700">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-slate-900">Rechtliches</p>
+        <ul class="mt-3 space-y-2 text-sm text-slate-500">
+          <li><a href="#impressum" class="hover:text-brand-700">Impressum</a></li>
+          <li><a href="#datenschutz" class="hover:text-brand-700">Datenschutz</a></li>
+          <li><a href="#agb" class="hover:text-brand-700">AGB</a></li>
+          <li><a href="#avv" class="hover:text-brand-700">AV-Vertrag</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-100">
+      <p class="mx-auto max-w-7xl px-4 py-6 text-xs text-slate-400 sm:px-6 lg:px-8">© <span id="year"></span> AIOptim. Alle Preise zzgl. gesetzlicher MwSt. Google ist eine Marke der Google LLC; AIOptim steht in keiner Verbindung zu Google.</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Sticky-CTA -->
+  <div id="stickyCta" class="fixed inset-x-0 bottom-0 z-30 translate-y-full border-t border-slate-200 bg-white/95 p-3 backdrop-blur transition-transform md:hidden">
+    <button type="button" data-open-signup class="w-full rounded-xl bg-brand-700 py-3 text-base font-semibold text-white shadow-sm">Kostenlos testen – 14 Tage</button>
+  </div>
+
+  <!-- ============ MODAL: ANALYSE-ERGEBNIS ============ -->
+  <div id="analysisModal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="analysisTitle">
+    <div class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <h2 id="analysisTitle" class="text-lg font-bold text-slate-900">Ihre Gratis-Analyse</h2>
+        <button type="button" data-close-modal class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Schließen">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="analysisBody" class="p-6"></div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: REGISTRIERUNG ============ -->
+  <div id="signupModal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <div class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <h2 id="signupTitle" class="text-lg font-bold text-slate-900">14 Tage kostenlos testen</h2>
+        <button type="button" data-close-modal class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Schließen">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <form id="signupForm" class="space-y-4 p-6" novalidate>
+        <fieldset>
+          <legend class="mb-2 text-sm font-semibold text-slate-900">Tarif</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="plan" value="basis" class="peer sr-only" />
+              <span class="block rounded-xl border-2 border-slate-200 p-3 text-sm peer-checked:border-brand-700 peer-checked:bg-brand-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">
+                <span class="block font-bold text-slate-900">Basis</span><span class="text-slate-500">19 € / Monat</span>
+              </span>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="plan" value="pro" class="peer sr-only" checked />
+              <span class="block rounded-xl border-2 border-slate-200 p-3 text-sm peer-checked:border-brand-700 peer-checked:bg-brand-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">
+                <span class="block font-bold text-slate-900">Pro / Booster</span><span class="text-slate-500">39 € / Monat</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+        <div>
+          <label for="suBusiness" class="mb-1 block text-sm font-semibold text-slate-900">Name Ihres Betriebs</label>
+          <input id="suBusiness" name="business" type="text" required minlength="2" autocomplete="organization" class="h-11 w-full rounded-xl border border-slate-300 px-3 text-base focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" placeholder="z. B. Malerbetrieb Schulz" />
+        </div>
+        <div>
+          <label for="suEmail" class="mb-1 block text-sm font-semibold text-slate-900">E-Mail-Adresse</label>
+          <input id="suEmail" name="email" type="email" required autocomplete="email" inputmode="email" class="h-11 w-full rounded-xl border border-slate-300 px-3 text-base focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" placeholder="ihre@email.de" />
+        </div>
+        <label class="flex items-start gap-2 text-xs text-slate-600">
+          <input type="checkbox" name="consent" required class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-500" />
+          <span>Ich akzeptiere die <a href="#agb" class="font-semibold text-brand-700 underline">AGB</a> und habe die <a href="#datenschutz" class="font-semibold text-brand-700 underline">Datenschutzerklärung</a> gelesen.</span>
+        </label>
+        <p id="signupError" class="hidden text-sm font-medium text-rose-600" role="alert"></p>
+        <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-700 text-base font-semibold text-white shadow-sm transition hover:bg-brand-800 disabled:cursor-wait disabled:opacity-70">
+          <span>Kostenlos starten</span>
+        </button>
+        <p class="text-center text-xs text-slate-500">Keine Kreditkarte · Test endet automatisch · DSGVO-konform</p>
+      </form>
+      <div id="signupSuccess" class="hidden p-6" role="status"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="pointer-events-none fixed left-1/2 top-20 z-[60] -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white opacity-0 shadow-lg transition-opacity" role="status" aria-live="polite"></div>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
