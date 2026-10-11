@@ -374,7 +374,6 @@
       </div>
 
       <button type="button" id="analysisCta" class="mt-6 h-12 w-full rounded-xl bg-brand-700 text-base font-semibold text-white shadow-sm transition hover:bg-brand-800">Jetzt Potenzial nutzen – 14 Tage gratis</button>
-      <a href="app.html${business.source === 'name' ? `?business=${encodeURIComponent(business.name)}` : ''}" class="mt-2 flex h-11 w-full items-center justify-center rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">Erst die Live-Demo ansehen</a>
       <p class="mt-3 text-center text-xs text-slate-500">Vorschau auf Basis einer Schnellanalyse. Den vollständigen Bericht mit Live-Daten erhalten Sie nach der Verbindung Ihres Google-Profils.</p>`;
 
     $('#analysisCta').addEventListener('click', () => {
@@ -551,11 +550,9 @@
         ${CONFIG.leadEndpoint
           ? `<p class="mt-2 text-sm text-slate-600">Wir haben Ihren Zugang an <strong class="text-slate-900">${escapeHtml(lead.email)}</strong> geschickt.</p>`
           : `<p class="mt-2 text-sm text-slate-600">Ihre Anmeldung für <strong class="text-slate-900">${escapeHtml(lead.email)}</strong> ist vorgemerkt.</p>
-             <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Demo-Modus: Es wurde keine E-Mail versendet, weil noch kein Server angebunden ist.</p>`}
+             <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Hinweis: Der E-Mail-Versand ist noch nicht eingerichtet, deshalb wurde keine E-Mail verschickt.</p>`}
         <p class="mt-2 text-xs text-slate-500">Tarif: ${planName} · Gratis bis ${trialEndDate()}</p>
-      </div>
-      <a href="app.html${lead.business ? `?business=${encodeURIComponent(lead.business)}` : ''}" class="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-brand-700 font-semibold text-white hover:bg-brand-800">Dashboard jetzt ausprobieren →</a>
-      <p class="mt-3 text-center text-xs text-slate-500">Mit simulierten Testbewertungen – ohne Anmeldung.</p>`;
+      </div>`;
   }
 
   function setError(el, msg) {
@@ -563,7 +560,7 @@
     el.classList.toggle('hidden', !msg);
   }
 
-  function openSignup({ plan, business, email, mode } = {}) {
+  function openSignup({ plan, business, email } = {}) {
     const form = $('#signupForm');
     form.classList.remove('hidden');
     $('#signupSuccess').classList.add('hidden');
@@ -571,7 +568,6 @@
     if (plan) $(`input[name=plan][value="${plan}"]`, form).checked = true;
     if (business) form.business.value = business;
     if (email) form.email.value = email;
-    $('#signupTitle').textContent = mode === 'login' ? 'Konto anlegen oder anmelden' : '14 Tage kostenlos testen';
     openModal('signupModal');
     setTimeout(() => (form.business.value ? form.email : form.business).focus(), 40);
   }
@@ -581,7 +577,7 @@
       const trigger = e.target.closest('[data-open-signup]');
       if (!trigger) return;
       e.preventDefault();
-      openSignup({ plan: trigger.dataset.plan, mode: trigger.dataset.mode });
+      openSignup({ plan: trigger.dataset.plan });
       track('signup_opened', { plan: trigger.dataset.plan || null });
     });
 

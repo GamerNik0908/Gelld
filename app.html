@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AIOptim Dashboard – Live-Demo</title>
+  <title>Dashboard – AIOptim</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#1d4ed8" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Cpath d='M16 6l2.9 6.2 6.8.8-5 4.6 1.3 6.7L16 21l-6 3.3 1.3-6.7-5-4.6 6.8-.8z' fill='%23fbbf24'/%3E%3C/svg%3E" />
@@ -17,28 +17,15 @@
         extend: {
           fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
           colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' } },
-          boxShadow: { soft: '0 10px 40px -12px rgba(15, 23, 42, 0.18)' },
         },
       },
     };
   </script>
-  <style>
-    .typing-caret::after { content: '▍'; margin-left: 1px; color: #2563eb; animation: blink 1s steps(1) infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-    .review-new { animation: slideIn .35s ease-out; }
-    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
-  </style>
+  <script src="assets/auth.js"></script>
+  <script>window.AIOptimAuth.requireAuth();</script>
+  <style>.pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }</style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-700 antialiased">
-
-  <!-- Demo-Hinweisleiste -->
-  <div class="bg-amber-400 px-4 py-2 text-center text-xs font-semibold text-slate-900 sm:text-sm">
-    Live-Demo mit simulierten Testbewertungen – es wird nichts bei Google veröffentlicht.
-    <a href="index.html#preise" class="ml-1 underline">Echten Test starten →</a>
-  </div>
-
   <div class="lg:flex">
     <!-- Sidebar (Desktop) -->
     <aside class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
@@ -49,7 +36,7 @@
       <nav class="flex-1 space-y-1 p-4" aria-label="Dashboard">
         <button type="button" data-view="inbox" class="nav-btn flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 13h4l2 3h4l2-3h4M5 5h14l1 8v6H4v-6z"/></svg>
-          Posteingang <span data-open-count class="ml-auto rounded-full bg-brand-700 px-2 py-0.5 text-xs font-bold text-white">0</span>
+          Posteingang
         </button>
         <button type="button" data-view="stats" class="nav-btn flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M5 20V10M12 20V4M19 20v-7"/></svg>
@@ -65,8 +52,9 @@
         </button>
       </nav>
       <div class="border-t border-slate-100 p-4">
-        <p class="truncate text-sm font-semibold text-slate-900" data-business-name>Ihr Betrieb</p>
-        <p class="text-xs text-slate-500">Pro / Booster · Demo</p>
+        <p class="truncate text-sm font-semibold text-slate-900" data-business-name></p>
+        <p class="truncate text-xs text-slate-500" data-user-email></p>
+        <button type="button" data-logout class="mt-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Abmelden</button>
       </div>
     </aside>
 
@@ -76,126 +64,53 @@
         <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
           <div class="min-w-0">
             <h1 id="viewTitle" class="truncate text-lg font-bold text-slate-900">Posteingang</h1>
-            <p class="truncate text-xs text-slate-500"><span data-business-name>Ihr Betrieb</span> · Google-Unternehmensprofil (Test)</p>
+            <p class="truncate text-xs text-slate-500" data-business-name></p>
           </div>
-          <a href="index.html" class="shrink-0 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 lg:hidden">Zur Website</a>
+          <button type="button" data-logout class="shrink-0 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 lg:hidden">Abmelden</button>
         </div>
       </header>
 
       <main class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+        <p id="welcome" class="mb-6 text-sm text-slate-600"></p>
 
         <!-- ================= POSTEINGANG ================= -->
         <section data-panel="inbox">
-          <!-- Simulator -->
-          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
-                <span class="grid h-10 w-10 place-items-center rounded-xl bg-slate-100">
-                  <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 01-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0012 22z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 000 9.2L6.4 14z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 003.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z"/></svg>
-                </span>
-                <div>
-                  <p class="font-semibold text-slate-900">Test-Google</p>
-                  <p class="flex items-center gap-1.5 text-xs text-slate-500">
-                    <span id="simDot" class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    <span id="simStatus">Simulation läuft</span>
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <label class="sr-only" for="simSpeed">Tempo</label>
-                <select id="simSpeed" class="rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-8 text-sm font-medium text-slate-700 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
-                  <option value="15">alle 15 Sek.</option>
-                  <option value="30">alle 30 Sek.</option>
-                  <option value="60">jede Minute</option>
-                  <option value="120">alle 2 Min.</option>
-                </select>
-                <button type="button" id="simToggle" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Pausieren</button>
-              </div>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Offen</p><p class="mt-1 text-2xl font-bold text-slate-900">0</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Bewertung</p><p class="mt-1 text-2xl font-bold text-slate-900">–</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Antwortquote</p><p class="mt-1 text-2xl font-bold text-slate-900">–</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Zeit gespart</p><p class="mt-1 text-2xl font-bold text-slate-900">0 Min.</p></div>
+          </div>
+
+          <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+            <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100">
+              <svg class="h-7 w-7" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 01-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0012 22z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 000 9.2L6.4 14z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 003.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z"/></svg>
             </div>
-            <div class="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:items-center">
-              <p class="text-sm text-slate-600 sm:mr-auto">Nächste Bewertung in <strong id="simCountdown" class="text-slate-900">–</strong></p>
-              <div class="grid grid-cols-4 gap-2 sm:flex">
-                <button type="button" data-sim-stars="0" class="rounded-lg bg-brand-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-800">Zufällig</button>
-                <button type="button" data-sim-stars="5" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" aria-label="5-Sterne-Bewertung senden">5 ★</button>
-                <button type="button" data-sim-stars="3" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" aria-label="3-Sterne-Bewertung senden">3 ★</button>
-                <button type="button" data-sim-stars="1" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" aria-label="1-Stern-Bewertung senden">1 ★</button>
-              </div>
-            </div>
+            <h2 class="mt-4 text-lg font-bold text-slate-900">Noch keine Bewertungen</h2>
+            <p class="mx-auto mt-2 max-w-md text-sm text-slate-600">Sobald Ihr Google-Unternehmensprofil verbunden ist, erscheinen neue Bewertungen hier – jeweils mit einem fertigen Antwortvorschlag.</p>
+            <button type="button" id="connectGoogle" class="mt-6 rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800">Google-Profil verbinden</button>
           </div>
-
-          <!-- KPI-Leiste -->
-          <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Offen</p><p class="mt-1 text-2xl font-bold text-slate-900" data-kpi="open">0</p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Bewertung</p><p class="mt-1 text-2xl font-bold text-slate-900" data-kpi="avg">–</p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Antwortquote</p><p class="mt-1 text-2xl font-bold text-slate-900" data-kpi="rate">–</p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Zeit gespart</p><p class="mt-1 text-2xl font-bold text-slate-900" data-kpi="saved">0 Min.</p></div>
-          </div>
-
-          <!-- Filter -->
-          <div class="mt-6 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Filter">
-            <button type="button" data-filter="open" class="filter-btn whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">Offen</button>
-            <button type="button" data-filter="critical" class="filter-btn whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">Kritisch (1–3 ★)</button>
-            <button type="button" data-filter="answered" class="filter-btn whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">Beantwortet</button>
-            <button type="button" data-filter="all" class="filter-btn whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">Alle</button>
-          </div>
-
-          <div id="reviewList" class="mt-4 space-y-4" aria-live="polite"></div>
         </section>
 
         <!-- ================= STATISTIK ================= -->
-        <section data-panel="stats" class="hidden space-y-6">
+        <section data-panel="stats" class="hidden">
           <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Bewertungen gesamt</p><p class="mt-1 text-2xl font-bold text-slate-900" data-stat="total">0</p><p class="mt-1 text-xs text-slate-500" data-stat="newCount"></p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Bewertung</p><p class="mt-1 text-2xl font-bold text-slate-900" data-stat="avg">–</p><p class="mt-1 text-xs text-slate-500">aus allen Bewertungen</p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Antwortquote</p><p class="mt-1 text-2xl font-bold text-slate-900" data-stat="rate">–</p><p class="mt-1 text-xs" data-stat="rateDelta"></p></div>
-            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Reaktionszeit</p><p class="mt-1 text-2xl font-bold text-slate-900" data-stat="responseTime">–</p><p class="mt-1 text-xs text-slate-500">seit Eingang der Bewertung</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Bewertungen gesamt</p><p class="mt-1 text-2xl font-bold text-slate-900">0</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Bewertung</p><p class="mt-1 text-2xl font-bold text-slate-900">–</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Antwortquote</p><p class="mt-1 text-2xl font-bold text-slate-900">–</p></div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-medium text-slate-500">Ø Reaktionszeit</p><p class="mt-1 text-2xl font-bold text-slate-900">–</p></div>
           </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <h2 class="font-bold text-slate-900">Verteilung der Sterne</h2>
-            <p class="text-sm text-slate-500">Alle Bewertungen auf Ihrem Profil</p>
-            <div id="starBars" class="mt-5 space-y-3"></div>
-          </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <h2 class="font-bold text-slate-900">Ihre Ersparnis</h2>
-            <p class="mt-2 text-sm leading-relaxed text-slate-600">Wir rechnen mit rund 4 Minuten pro selbst formulierter Antwort. Mit AIOptim braucht eine Freigabe etwa 10 Sekunden.</p>
-            <p class="mt-4 text-3xl font-extrabold text-emerald-600" data-stat="saved">0 Min.</p>
-            <p class="text-sm text-slate-500" data-stat="savedNote">gespart in dieser Demo</p>
+          <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+            <h2 class="font-bold text-slate-900">Noch keine Daten</h2>
+            <p class="mx-auto mt-2 max-w-md text-sm text-slate-600">Die Statistik füllt sich automatisch, sobald Bewertungen eingehen.</p>
           </div>
         </section>
 
         <!-- ================= RANKING ================= -->
-        <section data-panel="ranking" class="hidden space-y-6">
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 class="font-bold text-slate-900">Ihre Platzierung bei Google Maps</h2>
-                <p class="text-sm text-slate-500">Lokale Suche im Umkreis von 5 km · Vergleich zur Vorwoche</p>
-              </div>
-              <button type="button" id="reportBtn" class="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800">Wochenbericht ansehen</button>
-            </div>
-            <div class="mt-5 overflow-x-auto">
-              <table class="w-full min-w-[28rem] text-left text-sm">
-                <thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                  <tr><th class="py-2 pr-4 font-semibold">Suchbegriff</th><th class="py-2 pr-4 font-semibold">Vorwoche</th><th class="py-2 pr-4 font-semibold">Jetzt</th><th class="py-2 font-semibold">Veränderung</th></tr>
-                </thead>
-                <tbody id="rankingRows" class="divide-y divide-slate-100"></tbody>
-              </table>
-            </div>
-            <p class="mt-4 rounded-lg bg-brand-50 p-3 text-sm text-brand-800" id="rankingTip"></p>
-          </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <h2 class="font-bold text-slate-900">Mitbewerber im Umkreis</h2>
-            <div class="mt-4 overflow-x-auto">
-              <table class="w-full min-w-[28rem] text-left text-sm">
-                <thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                  <tr><th class="py-2 pr-4 font-semibold">Betrieb</th><th class="py-2 pr-4 font-semibold">Ø Sterne</th><th class="py-2 pr-4 font-semibold">Bewertungen</th><th class="py-2 font-semibold">Antwortquote</th></tr>
-                </thead>
-                <tbody id="competitorRows" class="divide-y divide-slate-100"></tbody>
-              </table>
-            </div>
+        <section data-panel="ranking" class="hidden">
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+            <h2 class="text-lg font-bold text-slate-900">Ihr erster Ranking-Report</h2>
+            <p class="mx-auto mt-2 max-w-md text-sm text-slate-600">Nach der Verbindung mit Google ermitteln wir wöchentlich Ihre Platzierung bei Google Maps für Ihre wichtigsten Suchbegriffe. Den Bericht erhalten Sie jeden Montag per E-Mail.</p>
           </div>
         </section>
 
@@ -208,7 +123,14 @@
                 <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-900">Name des Betriebs</span>
                   <input name="business" required class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" /></label>
                 <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-900">Branche</span>
-                  <select name="industry" class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"></select></label>
+                  <select name="industry" class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30">
+                    <option value="friseur">Friseursalon</option>
+                    <option value="handwerk">Handwerksbetrieb</option>
+                    <option value="fahrschule">Fahrschule</option>
+                    <option value="restaurant">Restaurant / Café</option>
+                    <option value="kfz">KFZ-Werkstatt</option>
+                    <option value="sonstiges">Sonstiges</option>
+                  </select></label>
                 <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-900">Unterschrift unter Antworten</span>
                   <input name="signature" class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" placeholder="z. B. Anna Becker, Inhaberin" /></label>
                 <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-900">Telefon für Rückfragen</span>
@@ -220,19 +142,33 @@
               <h2 class="font-bold text-slate-900">KI-Antworten</h2>
               <fieldset class="mt-4">
                 <legend class="mb-2 text-sm font-semibold text-slate-900">Tonfall</legend>
-                <div class="grid gap-2 sm:grid-cols-3" id="toneOptions"></div>
+                <div class="grid gap-2 sm:grid-cols-3">
+                  <label class="cursor-pointer"><input type="radio" name="tone" value="herzlich" class="peer sr-only" />
+                    <span class="block rounded-xl border-2 border-slate-200 p-3 text-center text-sm peer-checked:border-brand-700 peer-checked:bg-brand-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500"><span class="block font-semibold text-slate-900">Herzlich</span><span class="text-xs text-slate-500">Sie, warm</span></span></label>
+                  <label class="cursor-pointer"><input type="radio" name="tone" value="professionell" class="peer sr-only" />
+                    <span class="block rounded-xl border-2 border-slate-200 p-3 text-center text-sm peer-checked:border-brand-700 peer-checked:bg-brand-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500"><span class="block font-semibold text-slate-900">Professionell</span><span class="text-xs text-slate-500">Sie, sachlich</span></span></label>
+                  <label class="cursor-pointer"><input type="radio" name="tone" value="locker" class="peer sr-only" />
+                    <span class="block rounded-xl border-2 border-slate-200 p-3 text-center text-sm peer-checked:border-brand-700 peer-checked:bg-brand-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500"><span class="block font-semibold text-slate-900">Locker</span><span class="text-xs text-slate-500">Du, entspannt</span></span></label>
+                </div>
               </fieldset>
               <div class="mt-5 space-y-3">
                 <label class="flex items-start gap-3"><input type="checkbox" name="autoApprove5" class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-500" />
                   <span><span class="block text-sm font-semibold text-slate-900">5-Sterne-Bewertungen automatisch beantworten</span><span class="block text-sm text-slate-500">Kritik geht nie automatisch raus – die geben Sie immer selbst frei.</span></span></label>
                 <label class="flex items-start gap-3"><input type="checkbox" name="alertCritical" class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-500" />
-                  <span><span class="block text-sm font-semibold text-slate-900">Sofort-Alarm bei Kritik (1–3 ★)</span><span class="block text-sm text-slate-500">In der Demo als Browser-Benachrichtigung, im echten Produkt per E-Mail &amp; SMS.</span></span></label>
+                  <span><span class="block text-sm font-semibold text-slate-900">Sofort-Alarm bei Kritik (1–3 ★)</span><span class="block text-sm text-slate-500">Per E-Mail und SMS.</span></span></label>
               </div>
             </div>
 
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <button type="button" id="resetDemo" class="order-2 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 sm:order-1">Demo zurücksetzen</button>
-              <button type="submit" class="order-1 rounded-xl bg-brand-700 px-6 py-3 font-semibold text-white hover:bg-brand-800 sm:order-2">Einstellungen speichern</button>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+              <h2 class="font-bold text-slate-900">Konto</h2>
+              <dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                <div><dt class="text-slate-500">E-Mail-Adresse</dt><dd class="mt-1 font-semibold text-slate-900" data-user-email></dd></div>
+                <div><dt class="text-slate-500">Tarif</dt><dd class="mt-1 font-semibold text-slate-900" data-user-plan></dd></div>
+              </dl>
+            </div>
+
+            <div class="flex justify-end">
+              <button type="submit" class="w-full rounded-xl bg-brand-700 px-6 py-3 font-semibold text-white hover:bg-brand-800 sm:w-auto">Einstellungen speichern</button>
             </div>
           </form>
         </section>
@@ -242,9 +178,8 @@
 
   <!-- Bottom-Navigation (Mobil) -->
   <nav class="pb-safe fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-slate-200 bg-white lg:hidden" aria-label="Dashboard">
-    <button type="button" data-view="inbox" class="nav-btn relative flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold">
-      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 13h4l2 3h4l2-3h4M5 5h14l1 8v6H4v-6z"/></svg>
-      Posteingang <span data-open-count class="absolute right-[22%] top-1 rounded-full bg-brand-700 px-1.5 text-[10px] font-bold text-white">0</span>
+    <button type="button" data-view="inbox" class="nav-btn flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 13h4l2 3h4l2-3h4M5 5h14l1 8v6H4v-6z"/></svg>Posteingang
     </button>
     <button type="button" data-view="stats" class="nav-btn flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold">
       <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M5 20V10M12 20V4M19 20v-7"/></svg>Statistik
@@ -256,36 +191,6 @@
       <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Einstellungen
     </button>
   </nav>
-
-  <!-- Onboarding -->
-  <div id="onboarding" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="obTitle">
-    <form id="onboardingForm" class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl bg-white p-6 shadow-2xl sm:rounded-2xl">
-      <p class="text-xs font-bold uppercase tracking-wider text-brand-700">Live-Demo · ohne Anmeldung</p>
-      <h2 id="obTitle" class="mt-2 text-xl font-bold text-slate-900">In 10 Sekunden startklar</h2>
-      <p class="mt-2 text-sm text-slate-600">Wir simulieren Ihr Google-Profil. Nach und nach gehen Testbewertungen ein, und Sie sehen, wie AIOptim darauf antwortet.</p>
-      <label class="mt-5 block"><span class="mb-1 block text-sm font-semibold text-slate-900">Name Ihres Betriebs</span>
-        <input name="business" required minlength="2" class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" placeholder="z. B. Salon Haarmonie" /></label>
-      <label class="mt-4 block"><span class="mb-1 block text-sm font-semibold text-slate-900">Branche</span>
-        <select name="industry" class="h-11 w-full rounded-xl border border-slate-300 px-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"></select></label>
-      <fieldset class="mt-4"><legend class="mb-2 text-sm font-semibold text-slate-900">Tonfall der Antworten</legend>
-        <div class="grid grid-cols-3 gap-2" id="obToneOptions"></div></fieldset>
-      <p id="obError" class="mt-3 hidden text-sm font-medium text-rose-600" role="alert"></p>
-      <button type="submit" class="mt-6 h-12 w-full rounded-xl bg-brand-700 font-semibold text-white hover:bg-brand-800">Demo starten</button>
-    </form>
-  </div>
-
-  <!-- Wochenbericht -->
-  <div id="reportModal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
-    <div class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-slate-100 shadow-2xl sm:rounded-2xl">
-      <div class="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-3">
-        <p id="reportTitle" class="text-sm font-semibold text-slate-900">E-Mail-Vorschau: Wochenbericht</p>
-        <button type="button" data-close class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Schließen">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
-        </button>
-      </div>
-      <div id="reportBody" class="p-4 sm:p-6"></div>
-    </div>
-  </div>
 
   <div id="toast" class="pointer-events-none fixed left-1/2 top-4 z-[60] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white opacity-0 shadow-lg transition-opacity" role="status" aria-live="polite"></div>
 

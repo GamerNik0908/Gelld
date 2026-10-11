@@ -16,7 +16,8 @@ python3 -m http.server 8000   # dann http://localhost:8000 öffnen
 |---|---|
 | `index.html` | Alle Sektionen: Header/Navigation, Hero mit Gratis-Analyse & interaktiver Demo, Problem, Feature-Matrix, Kundenstimmen, Preise, FAQ, Lead-Catcher, Footer, Modals |
 | `assets/app.js` | Logik der Landingpage (siehe unten) |
-| `app.html` + `assets/dashboard.js` | **Live-Demo des Dashboards** – ohne Anmeldung, mit simulierten Google-Bewertungen |
+| `login.html` + `assets/auth.js` | Login-Seite und Anmelde-Logik |
+| `app.html` + `assets/dashboard.js` | Dashboard (nur nach Anmeldung erreichbar) |
 
 ### Funktionen in `assets/app.js`
 
@@ -27,15 +28,22 @@ python3 -m http.server 8000   # dann http://localhost:8000 öffnen
 - **FAQ**: barrierearmes Akkordeon und automatisch erzeugtes `FAQPage`-Schema (JSON-LD) für Google.
 - Mobiles Menü, Sticky-CTA auf dem Handy, Fokus-Falle und Schließen per Escape in Modals, Unterstützung für `prefers-reduced-motion`.
 
-### Live-Demo (`app.html`)
+### Login & Dashboard
 
-Öffnen Sie `http://localhost:8000/app.html` oder klicken Sie auf der Landingpage auf „Live-Demo“.
+Über „Anmelden“ auf der Landingpage oder direkt unter `http://localhost:8000/login.html`.
 
-- **Test-Google**: Nach und nach gehen simulierte Bewertungen ein, alle 15 Sekunden bis 2 Minuten, einstellbar und pausierbar. Mit den Knöpfen „Zufällig“, „5 ★“, „3 ★“ und „1 ★“ lösen Sie sofort eine Bewertung aus.
-- **KI-Antworten**: Eine lokale Vorlagen-Engine erkennt Lob und Kritik (Freundlichkeit, Wartezeit, Erreichbarkeit, Preis …) und formuliert passend. Den Tonfall wählen Sie pro Bewertung, außerdem können Sie neu formulieren, die Antwort anpassen oder sie mit einem Klick freigeben.
-- **Posteingang** mit Filtern (offen, kritisch, beantwortet), Kennzahlen, **Statistik**, **Ranking-Report** mit Mitbewerbern und einer Vorschau auf die wöchentliche E-Mail.
-- **Einstellungen**: Betrieb, Branche (Friseur, Handwerk, Fahrschule, Restaurant, KFZ), Unterschrift, Telefon, Tonfall, Auto-Antwort auf 5 Sterne, Browser-Alarm bei Kritik und Zurücksetzen der Demo.
-- Alles wird im `localStorage` (`aioptim_demo_v1`) gespeichert. Ranking- und Mitbewerberzahlen sind simuliert.
+**Vorab angelegter Benutzer:**
+
+| E-Mail | Passwort |
+|---|---|
+| `demo@aioptim.de` | `Demo1234!` |
+
+- Ohne Anmeldung leitet `app.html` automatisch zum Login um.
+- „Angemeldet bleiben“ speichert die Sitzung dauerhaft im Browser, sonst gilt sie nur bis zum Schließen des Tabs.
+- Im Dashboard gibt es Posteingang, Statistik und Ranking-Report (alle leer, bis Google angebunden ist) sowie Einstellungen (Betrieb, Branche, Unterschrift, Telefon, Tonfall, Auto-Antwort, Alarm). Die Einstellungen werden pro Benutzer im `localStorage` gespeichert.
+- Weitere Benutzer legen Sie in `assets/auth.js` im Array `USERS` an.
+
+> **Wichtig:** Die Anmeldung läuft nur im Browser. Benutzer und Passwort stehen im Quelltext und sind für jeden lesbar. Das reicht zum Testen, ist aber **kein Schutz**. Vor dem Livegang muss die Anmeldung auf einen Server umziehen (Passwort-Hash in einer Datenbank, Session-Cookie).
 
 ### Backend anbinden
 
