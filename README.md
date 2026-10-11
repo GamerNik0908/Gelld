@@ -15,7 +15,8 @@ python3 -m http.server 8000   # dann http://localhost:8000 öffnen
 | Datei | Inhalt |
 |---|---|
 | `index.html` | Alle Sektionen: Header/Navigation, Hero mit Gratis-Analyse & interaktiver Demo, Problem, Feature-Matrix, Kundenstimmen, Preise, FAQ, Lead-Catcher, Footer, Modals |
-| `assets/app.js` | Komplette Logik (siehe unten) |
+| `assets/app.js` | Logik der Landingpage (siehe unten) |
+| `app.html` + `assets/dashboard.js` | **Live-Demo des Dashboards** – ohne Anmeldung, mit simulierten Google-Bewertungen |
 
 ### Funktionen in `assets/app.js`
 
@@ -25,6 +26,16 @@ python3 -m http.server 8000   # dann http://localhost:8000 öffnen
 - **Preise**: Umschalter monatlich/jährlich. Jeder Tarif-Button öffnet die Registrierung mit vorausgewähltem Tarif.
 - **FAQ**: barrierearmes Akkordeon und automatisch erzeugtes `FAQPage`-Schema (JSON-LD) für Google.
 - Mobiles Menü, Sticky-CTA auf dem Handy, Fokus-Falle und Schließen per Escape in Modals, Unterstützung für `prefers-reduced-motion`.
+
+### Live-Demo (`app.html`)
+
+Öffnen Sie `http://localhost:8000/app.html` oder klicken Sie auf der Landingpage auf „Live-Demo“.
+
+- **Test-Google**: Nach und nach gehen simulierte Bewertungen ein, alle 15 Sekunden bis 2 Minuten, einstellbar und pausierbar. Mit den Knöpfen „Zufällig“, „5 ★“, „3 ★“ und „1 ★“ lösen Sie sofort eine Bewertung aus.
+- **KI-Antworten**: Eine lokale Vorlagen-Engine erkennt Lob und Kritik (Freundlichkeit, Wartezeit, Erreichbarkeit, Preis …) und formuliert passend. Den Tonfall wählen Sie pro Bewertung, außerdem können Sie neu formulieren, die Antwort anpassen oder sie mit einem Klick freigeben.
+- **Posteingang** mit Filtern (offen, kritisch, beantwortet), Kennzahlen, **Statistik**, **Ranking-Report** mit Mitbewerbern und einer Vorschau auf die wöchentliche E-Mail.
+- **Einstellungen**: Betrieb, Branche (Friseur, Handwerk, Fahrschule, Restaurant, KFZ), Unterschrift, Telefon, Tonfall, Auto-Antwort auf 5 Sterne, Browser-Alarm bei Kritik und Zurücksetzen der Demo.
+- Alles wird im `localStorage` (`aioptim_demo_v1`) gespeichert. Ranking- und Mitbewerberzahlen sind simuliert.
 
 ### Backend anbinden
 
